@@ -31,7 +31,7 @@ aws s3api put-bucket-versioning --bucket $BUCKET_NAME --versioning-configuration
 Release Manager creates signing profile
 
 ```bash
-aws signer put-signing-profile --platform-id "AWSLambda-SHA384-ECDSA" --profile-name Test1
+aws signer put-signing-profile --platform-id "AWSLambda-SHA384-ECDSA" --profile-name Test
 ```
 
 ### Create Developer user
@@ -101,14 +101,14 @@ unzip source.zip
 After review, release manager signs the code and updates the stack with the signed code
 
 ```bash
-SIGNING_PROFILE_ARN=$(aws signer get-signing-profile --profile-name Test1 --query profileVersionArn --output text)
+SIGNING_PROFILE_ARN=$(aws signer get-signing-profile --profile-name Test --query profileVersionArn --output text)
 
 sam deploy \
  --region $AWS_DEFAULT_REGION \
  --stack-name secure-keygen \
  --template-file ./.aws-sam/build/template.yaml \
  --parameter-overrides SigningProfileVersionArnParameter=$SIGNING_PROFILE_ARN \
- --signing-profiles ValidatorKeyGenFunction=Test1 \
+ --signing-profiles ValidatorKeyGenFunction=Test \
  --confirm-changeset \
  --capabilities CAPABILITY_IAM \
  --no-disable-rollback
@@ -160,8 +160,8 @@ aws iam delete-user --user-name secure-keygen-dev
 Delete the Signer profile
 
 ```bash
-PROFILE_VERSION=$(aws signer get-signing-profile --profile-name Test1 --query profileVersion --output text)
-aws signer revoke-signing-profile --profile-name Test1 \
+PROFILE_VERSION=$(aws signer get-signing-profile --profile-name Test --query profileVersion --output text)
+aws signer revoke-signing-profile --profile-name Test \
 --profile-version $PROFILE_VERSION \
 --reason "Unused" \
 --effective-time $(date +%s)
